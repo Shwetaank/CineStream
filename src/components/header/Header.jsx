@@ -1,70 +1,187 @@
 "use client";
-import { Button, DarkThemeToggle, Navbar } from "flowbite-react";
+import { Button, DarkThemeToggle, Navbar, TextInput } from "flowbite-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { HiOutlineArrowRight } from "react-icons/hi";
+import { useRouter, usePathname } from "next/navigation";
+import { HiOutlineArrowRight, HiOutlineSearch } from "react-icons/hi";
+import { useUser, UserButton } from "@clerk/nextjs";
+import { useState } from "react";
+import { motion } from "framer-motion";
 
 const Header = () => {
   const router = useRouter();
+  const pathname = usePathname();
+  const { isSignedIn } = useUser();
+  const [searchQuery, setSearchQuery] = useState("");
 
+  // Navigation links for the app
   const navLinks = [
     { path: "/movies", label: "Movies" },
     { path: "/tv-series", label: "Tv Series" },
     { path: "/bookmark", label: "Bookmarks" },
   ];
 
-  return (
-    <Navbar fluid rounded className="w-full text-center p-4">
-      <Navbar.Brand onClick={() => router.push("/")}>
-        <Image
-          src="/logo.png"
-          width={180}
-          height={50}
-          alt="Logo"
-          className="mr-3 cursor-pointer"
-        />
-      </Navbar.Brand>
-      <div className="flex items-center gap-2 md:gap-6 md:order-2">
-        <Button
-          outline
-          gradientDuoTone="purpleToPink"
-          onClick={() => router.push("/auth")}
-        >
-          <span className="hidden sm:inline">Get started</span>
-          <HiOutlineArrowRight className="md:ml-2 md:h-5 md:w-5 " />
-        </Button>
-        {/* <DarkThemeToggle /> */}
+  // Check if the current path is active
+  const isActive = (path) => pathname === path;
 
-        <div className="hidden md:flex md:justify-end md:items-center md:gap-6 xl:gap-10 list-none">
-          {navLinks.map(({ path, label }) => (
-            <div
-              key={path}
-              className="cursor-pointer"
-              onClick={() => router.push(path)}
+  // Handle search submission
+  const handleSearch = () => {
+    if (searchQuery) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+    }
+  };
+
+  // Handle 'Enter' key press for search
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSearch();
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1, ease: "easeInOut" }}
+    >
+      <Navbar fluid rounded className="w-full text-center p-4">
+        {/* Brand logo with click functionality */}
+        <motion.div
+          initial={{ x: -100 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+        >
+          <Navbar.Brand onClick={() => router.push("/")}>
+            <Image
+              src="/logo.png"
+              width={180}
+              height={50}
+              alt="Logo"
+              className="mr-3 cursor-pointer"
+            />
+          </Navbar.Brand>
+        </motion.div>
+
+        {/* Search bar for medium and larger screens */}
+        <motion.div
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.7, ease: "easeInOut" }}
+          className="hidden md:block max-w-md md:mx-auto"
+        >
+          <TextInput
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search..."
+            rightIcon={HiOutlineSearch}
+            onKeyDown={handleKeyDown}
+          />
+        </motion.div>
+
+        {/* User action buttons and toggles */}
+        <div className="flex items-center gap-2 md:gap-6 md:order-2">
+          {!isSignedIn ? (
+            // Sign-in button for users not signed in
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: "easeInOut" }}
             >
-              {label}
-            </div>
-          ))}
-        </div>
-        <div className="md:hidden flex gap-4 items-center">
-          <DarkThemeToggle />
-          <Navbar.Toggle />
-        </div>
-      </div>
-      <Navbar.Collapse className="md:hidden">
-        <div>
-          {navLinks.map(({ path, label }) => (
-            <div
-              key={path}
-              className="cursor-pointer"
-              onClick={() => router.push(path)}
+              <Button
+                outline
+                gradientDuoTone="purpleToPink"
+                onClick={() => router.push("/sign-in")}
+              >
+                <span className="hidden sm:inline">Get started</span>
+                <HiOutlineArrowRight className="inline sm:hidden h-5 w-5 ml-2" />
+              </Button>
+            </motion.div>
+          ) : (
+            <>
+              {/* Navigation links for signed-in users */}
+              <motion.div
+                initial={{ y: -20 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.7, ease: "easeInOut" }}
+                className="hidden font-semibold text-xl md:flex md:justify-end md:items-center md:gap-12 list-none"
+              >
+                {navLinks.map(({ path, label }) => (
+                  <div
+                    key={path}
+                    className={`cursor-pointer ${
+                      isActive(path)
+                        ? "text-blue-500 font-bold"
+                        : "hover:text-purple-700 hover:underline"
+                    } transition-colors duration-300`}
+                    onClick={() => router.push(path)}
+                  >
+                    {label}
+                  </div>
+                ))}
+              </motion.div>
+
+              {/* User profile button */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.7, ease: "easeInOut", delay: 0.2 }}
+              >
+                <UserButton className="ml-2" />
+              </motion.div>
+              <DarkThemeToggle />
+            </>
+          )}
+
+          {/* Navbar toggle button for mobile view */}
+          {isSignedIn && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              className="md:hidden"
             >
-              {label}
-            </div>
-          ))}
+              <Navbar.Toggle />
+            </motion.div>
+          )}
         </div>
-      </Navbar.Collapse>
-    </Navbar>
+
+        {/* Search bar for mobile view */}
+        {isSignedIn && (
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.7, ease: "easeInOut" }}
+            className="md:hidden flex flex-col items-center p-4 w-full"
+          >
+            <TextInput
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              rightIcon={HiOutlineSearch}
+              onKeyDown={handleKeyDown}
+              className="w-full"
+            />
+          </motion.div>
+        )}
+
+        {/* Collapsible navigation for mobile view */}
+        {isSignedIn && (
+          <Navbar.Collapse className="font-semibold text-xl p-2 md:hidden">
+            {navLinks.map(({ path, label }) => (
+              <div
+                key={path}
+                className={`cursor-pointer ${
+                  isActive(path) ? "text-blue-500 font-bold" : ""
+                }`}
+                onClick={() => router.push(path)}
+              >
+                {label}
+              </div>
+            ))}
+          </Navbar.Collapse>
+        )}
+      </Navbar>
+    </motion.div>
   );
 };
 
