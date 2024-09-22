@@ -14,6 +14,7 @@ const SignInPage = () => {
         quality={100}
         className="z-[-1]"
       />
+        <div className="absolute inset-0 bg-black opacity-30 z-[-1]" />
 
       {/* Page Content (including header, if any) */}
       <div className="relative w-full h-full">

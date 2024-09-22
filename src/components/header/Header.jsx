@@ -1,5 +1,5 @@
 "use client";
-import { Button, DarkThemeToggle, Navbar, TextInput } from "flowbite-react";
+import { Button, DarkThemeToggle, Navbar, NavbarToggle, TextInput } from "flowbite-react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { HiOutlineArrowRight, HiOutlineSearch } from "react-icons/hi";
@@ -79,26 +79,60 @@ const Header = () => {
 
         {/* User action buttons and toggles */}
         <div className="flex items-center gap-4">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeInOut" }}
-          >
-            <Button
-              outline
-              gradientDuoTone="purpleToPink"
-              onClick={() => router.push("/sign-in")}
+          {isSignedIn ? (
+            <>
+              {/* Navigation links for signed-in users */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: "easeInOut" }}
+                className="hidden font-semibold text-xl md:flex md:gap-8"
+              >
+                {navLinks.map(({ path, label }) => (
+                  <div
+                    key={path}
+                    className={`cursor-pointer ${
+                      isActive(path) ? "text-blue-500 font-bold" : "hover:text-purple-700 hover:underline"
+                    } transition-colors duration-300`}
+                    onClick={() => router.push(path)}
+                  >
+                    {label}
+                  </div>
+                ))}
+              </motion.div>
+
+              {/* User profile button */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.7, ease: "easeInOut", delay: 0.2 }}
+              >
+                <UserButton className="ml-2" />
+              </motion.div>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: "easeInOut" }}
             >
-              <span className="hidden sm:inline">Get started</span>
-              <HiOutlineArrowRight className="inline sm:hidden h-5 w-5 ml-2" />
-            </Button>
-          </motion.div>
+              <Button
+                outline
+                gradientDuoTone="purpleToPink"
+                onClick={() => router.push("/sign-in")}
+              >
+                <span className="hidden sm:inline">Get started</span>
+                <HiOutlineArrowRight className="inline sm:hidden h-5 w-5 ml-2" />
+              </Button>
+            </motion.div>
+          )}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, ease: "easeInOut" }}
           >
             <DarkThemeToggle />
+            <NavbarToggle/>
           </motion.div>
         </div>
 
