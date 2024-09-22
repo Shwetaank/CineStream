@@ -1,9 +1,27 @@
+"use client";
 import { SignUp } from "@clerk/nextjs";
+import Image from "next/image";
 
 const SignUpPage = () => {
   return (
-    <div className="flex w-full h-screen  items-center justify-center">
-      <SignUp />
+    <div className="relative w-full h-screen">
+      {/* Background Image */}
+      <Image
+        src="/Login-Page.jpg"
+        alt="Background"
+        fill
+        style={{ objectFit: "cover" }}
+        quality={100}
+        className="z-[-1]"
+      />
+
+      {/* Page Content */}
+      <div className="relative w-full h-full">
+        {/* SignUp Component */}
+        <div className="flex w-full h-full items-center justify-center">
+          <SignUp />
+        </div>
+      </div>
     </div>
   );
 };
