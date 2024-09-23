@@ -1,0 +1,30 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  email     String    @unique
+  bookmarks Bookmark[]
+  comments  Comment[]
+}
+
+model Bookmark {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId String
+  movieId String
+  user   User     @relation(fields: [userId], references: [id])  // Opposite relation field
+}
+
+model Comment {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String
+  movieId  String
+  content  String
+  user     User     @relation(fields: [userId], references: [id])  // Opposite relation field
+}
