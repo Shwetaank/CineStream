@@ -1,6 +1,13 @@
+// src/middleware.js or src/middleware.ts
+
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
+const isPublicRoute = createRouteMatcher([
+  "/", 
+  "/sign-in(.*)", 
+  "/sign-up(.*)", 
+  "/api/testimonials", // Make testimonials API route public
+]);
 
 export default clerkMiddleware((auth, request) => {
   if (!isPublicRoute(request)) {
@@ -10,9 +17,7 @@ export default clerkMiddleware((auth, request) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
+    "/(api|trpc)(.*)", // Always run for API routes
   ],
 };

@@ -1,15 +1,13 @@
-import Testimonails from "@/components/sections/Testimonails";
-import { Button } from "flowbite-react";
+import HeroSection from "@/components/sections/HeroSection";
 
-const Home = () => {
+const MainPage = () => {
   return (
-    <div className="w-full flex justify-center items-center">
-      <section id="testimonials">
-        {" "}
-        <Testimonails />
+    <main>
+      <section id="heroSection">
+        <HeroSection />
       </section>
-    </div>
+    </main>
   );
 };
 
-export default Home;
+export default MainPage;

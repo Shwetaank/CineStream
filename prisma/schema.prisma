@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,28 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId   String   @unique
-  email     String   @unique
-  bookmarks Bookmark[]
-  feedbacks Feedback[]
+model Movie {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  imageString   String
+  title         String
+  ageRating     Int // Consider renaming for clarity
+  duration      Int // Use Int if dealing with whole numbers
+  overview      String
+  release       Int
+  videoSource   String
+  category      String
+  youtubeString String
+  Bookmarks     Bookmark[] @relation("MovieBookmark")
+
+  createdAt DateTime @default(now())
 }
 
 model Bookmark {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String @db.ObjectId
-  movieId   String
-  tvSeriesId String?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String
+
+  movieId String? @db.ObjectId
+  Movie   Movie?  @relation(fields: [movieId], references: [id], name: "MovieBookmark")
 }
 
-model Feedback {
+model Testimonials {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  rating    Int
-  comment   String
+  userId    String
+  emailID   String?
+  avatar    String
+  rating    Float
+  remark    String // Added remark field to match your implementation
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
 }
