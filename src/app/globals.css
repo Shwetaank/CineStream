@@ -1,9 +1,21 @@
 /* Add Flowbite base styles */
-@import 'flowbite-react';
+@import "flowbite-react";
 
 /* Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@keyframes smooth-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
 
+.animate-pulse-smooth {
+  animation: smooth-pulse 1.5s ease-in-out infinite;
+}

@@ -5,13 +5,14 @@ import Footer from "@/components/footer/Footer";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { shadesOfPurple } from "@clerk/themes";
+import { ReduxProvider } from "@/store/provider";
 
 // Font optimization
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
-  preload: true, // Preload the font for better performance
+  preload: true,
 });
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
@@ -46,17 +47,19 @@ export default function RootLayout({ children }) {
           <ThemeModeScript />
           {/* Ensure any other necessary meta tags for SEO and accessibility */}
         </head>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-gray-200`}
-        >
-          {/* Flowbite integration for UI components */}
-          <Flowbite>
-            <Header />
-            <main className="flex-grow">{children}</main>{" "}
-            {/* Flex-grow for full page main content */}
-            <Footer />
-          </Flowbite>
-        </body>
+        <ReduxProvider>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-gray-200`}
+          >
+            {/* Flowbite integration for UI components */}
+            <Flowbite>
+              <Header />
+              <main className="flex-grow">{children}</main>{" "}
+              {/* Flex-grow for full page main content */}
+              <Footer />
+            </Flowbite>
+          </body>
+        </ReduxProvider>
       </html>
     </ClerkProvider>
   );

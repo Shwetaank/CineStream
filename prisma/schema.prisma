@@ -37,6 +37,6 @@ model Testimonials {
   emailID   String?
   avatar    String
   rating    Float
-  remark    String // Added remark field to match your implementation
+  remark    String 
   createdAt DateTime @default(now())
 }
