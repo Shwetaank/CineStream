@@ -155,7 +155,6 @@ const TestimonialForm = () => {
                   <Button
                     outline
                     gradientDuoTone="purpleToBlue"
-                    className="mt-6 animate-pulse-smooth"
                     type="submit"
                     disabled={loading}
                   >
