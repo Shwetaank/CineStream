@@ -6,7 +6,7 @@ export const fetchTestimonials = createAsyncThunk(
   "testimonials/fetchTestimonials",
   async () => {
     const response = await axios.get("/api/testimonials");
-    return response.data.testimonials; // Ensure this path returns the expected data structure
+    return response.data.testimonials; 
   }
 );
 
@@ -15,7 +15,7 @@ export const addTestimonial = createAsyncThunk(
   "testimonials/addTestimonial",
   async (testimonialData) => {
     const response = await axios.post("/api/testimonials", testimonialData);
-    return response.data.testimonial; // Ensure this path returns the expected data structure
+    return response.data.testimonial; 
   }
 );
 
@@ -24,9 +24,9 @@ const testimonialSlice = createSlice({
   initialState: {
     testimonials: [],
     status: "idle",
-    addStatus: "idle", // Track add status separately
+    addStatus: "idle", 
     error: null,
-    addError: null, // Separate error state for adding testimonial
+    addError: null, 
   },
   reducers: {},
   extraReducers: (builder) => {
