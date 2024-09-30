@@ -1,4 +1,3 @@
-// slice 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -24,7 +23,7 @@ export const fetchMoviesByGenre = createAsyncThunk(
 
       return {
         genre,
-        movies: detailedMovies.map(movie => movie.data),
+        movies: detailedMovies.map((movie) => movie.data),
         totalResults: response.data.totalResults,
       };
     }
@@ -46,7 +45,7 @@ const movieSlice = createSlice({
       state[genre].currentPage = page;
     },
     resetMovies: (state) => {
-      Object.keys(state).forEach(genre => {
+      Object.keys(state).forEach((genre) => {
         state[genre].data = [];
         state[genre].totalResults = 0;
         state[genre].loading = false;

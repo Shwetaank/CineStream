@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchMoviesByGenre, setPage } from "@/store/slices/movieSlice";
 import { Card, Spinner, Pagination } from "flowbite-react";
 import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
 
 // Custom hook for detecting window size
 const useWindowSize = () => {
@@ -19,7 +21,6 @@ const useWindowSize = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Memoize the size to avoid unnecessary recalculations
   return useMemo(() => windowSize, [windowSize]);
 };
 
@@ -28,7 +29,6 @@ const MovieCardSection = () => {
   const { action, adventure, comedy } = useSelector((state) => state.movies);
 
   const { width } = useWindowSize();
-
   const moviesPerPage = useMemo(() => (width <= 640 ? 1 : 4), [width]);
 
   const getCurrentPageByGenre = useCallback(
@@ -63,13 +63,21 @@ const MovieCardSection = () => {
 
   const renderMoviesSection = (genre, moviesData) => {
     const { data, loading, error, currentPage, totalResults } = moviesData;
-
     const paginatedMovies = data.slice(
       (currentPage - 1) * moviesPerPage,
       currentPage * moviesPerPage
     );
-
     const totalPages = Math.ceil(totalResults / moviesPerPage);
+
+    // Animation variants for motion
+    const cardVariants = {
+      hidden: { opacity: 0, y: 50 },
+      visible: (i) => ({
+        opacity: 1,
+        y: 0,
+        transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" },
+      }),
+    };
 
     return (
       <div className="mb-12">
@@ -87,44 +95,51 @@ const MovieCardSection = () => {
             No movies found. Try again please 😢
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {paginatedMovies.map((movie) => (
-              <Card
-                key={movie.imdbID}
-                className="bg-gray-200 dark:bg-gray-800 shadow-lg"
-              >
-                <Image
-                  className="w-full h-60 rounded-t-lg object-fill"
-                  src={movie.Poster}
-                  alt={`${movie.Title} Poster`}
-                  width={300}
-                  height={320}
-                  priority
-                />
-
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-purple-700">
-                    {movie.Title} ({movie.Year})
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    <strong>Rated:</strong> {movie.Rated || "N/A"}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    <strong>Genre:</strong> {movie.Genre || "N/A"}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    <strong>Runtime:</strong> {movie.Runtime || "N/A"}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    <strong>Released:</strong> {movie.Released || "N/A"}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-justify">
-                    <strong>Plot:</strong> {movie.Plot || "N/A"}
-                  </p>
-                </div>
-              </Card>
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.1 } },
+            }}
+          >
+            {paginatedMovies.map((movie, i) => (
+              <Link href={`/movies/${movie.imdbID}`} key={movie.imdbID}>
+                <motion.div custom={i} variants={cardVariants}>
+                  <Card className="bg-gray-200 dark:bg-gray-800 shadow-lg">
+                    <Image
+                      className="w-full h-60 rounded-t-lg object-fill"
+                      src={movie.Poster}
+                      alt={`${movie.Title} Poster`}
+                      width={300}
+                      height={320}
+                      priority
+                    />
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-purple-700">
+                        {movie.Title} ({movie.Year})
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        <strong>Rated:</strong> {movie.Rated || "N/A"}
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        <strong>Genre:</strong> {movie.Genre || "N/A"}
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        <strong>Runtime:</strong> {movie.Runtime || "N/A"}
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        <strong>Released:</strong> {movie.Released || "N/A"}
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-justify">
+                        <strong>Plot:</strong> {movie.Plot || "N/A"}
+                      </p>
+                    </div>
+                  </Card>
+                </motion.div>
+              </Link>
             ))}
-          </div>
+          </motion.div>
         )}
         <div className="flex justify-center mt-4">
           <Pagination
@@ -141,11 +156,8 @@ const MovieCardSection = () => {
   };
 
   return (
-    <div className="pt-16 pb-20 px-4 sm:px-6 md:px-10 lg:px-12 ">
-      <h2 className="text-4xl font-bold mb-6  text-center">
-        Explore Movies
-      </h2>
-
+    <div className="pt-16 pb-20 px-4 sm:px-6 md:px-10 lg:px-12">
+      <h2 className="text-4xl font-bold mb-6 text-center">Explore Movies</h2>
       {renderMoviesSection("action", action)}
       {renderMoviesSection("adventure", adventure)}
       {renderMoviesSection("comedy", comedy)}
