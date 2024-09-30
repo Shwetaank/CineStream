@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Spinner, Card } from "flowbite-react";
 import axios from "axios";
 import Image from "next/image";
@@ -14,6 +14,36 @@ const MovieDetails = ({ params }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [trailerUrl, setTrailerUrl] = useState("");
+  const debounceTimeout = useRef(null);
+
+  const debounceFetchTrailerId = useCallback((title) => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    debounceTimeout.current = setTimeout(async () => {
+      const trailerId = await fetchTrailerId(title);
+      setTrailerUrl(trailerId);
+    }, 500);
+  }, []);
+
+  const fetchTrailerId = async (title) => {
+    try {
+      const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+      const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+        title + " trailer"
+      )}&key=${apiKey}`;
+
+      const response = await axios.get(searchUrl);
+
+      if (response.data.items.length > 0) {
+        return response.data.items[0].id.videoId;
+      }
+      return "";
+    } catch (error) {
+      console.error("Failed to fetch trailer:", error);
+      return "";
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -27,8 +57,7 @@ const MovieDetails = ({ params }) => {
 
         if (response.data.Response === "True") {
           setMovie(response.data);
-          const trailerId = await fetchTrailerId(response.data.Title);
-          setTrailerUrl(trailerId);
+          debounceFetchTrailerId(response.data.Title);
         } else {
           setError(
             response.data.Error ||
@@ -42,27 +71,8 @@ const MovieDetails = ({ params }) => {
       }
     };
 
-    const fetchTrailerId = async (title) => {
-      try {
-        const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
-        const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-          title + " trailer"
-        )}&key=${apiKey}`;
-
-        const response = await axios.get(searchUrl);
-        console.log(response.data);
-        if (response.data.items.length > 0) {
-          return response.data.items[0].id.videoId;
-        }
-        return "";
-      } catch (error) {
-        console.error("Failed to fetch trailer:", error);
-        return "";
-      }
-    };
-
     fetchMovieDetails();
-  }, [id]);
+  }, [id, debounceFetchTrailerId]);
 
   if (loading) {
     return (
@@ -127,7 +137,7 @@ const MovieDetails = ({ params }) => {
               variants={itemVariants}
             >
               {/* Movie Poster */}
-              <Card className="shadow-lg mb-6  dark:bg-gray-800">
+              <Card className="shadow-lg mb-6 dark:bg-gray-800">
                 <Image
                   className="object-fill w-full h-[500px] rounded-lg"
                   src={movie.Poster}
@@ -138,14 +148,14 @@ const MovieDetails = ({ params }) => {
                 />
               </Card>
               {/* Movie Title and Basic Info */}
-              <Card className="shadow-lg mb-6  dark:bg-gray-800">
+              <Card className="shadow-lg mb-6 dark:bg-gray-800">
                 <div className="p-4">
                   <h1 className="text-3xl font-bold text-purple-700 mb-2">
                     {movie.Title} 🌟
                   </h1>
                   <div className="flex items-center mb-2">
                     <FaStar className="text-yellow-500 mr-1" />
-                    <span className="text-lg font-semibold ">
+                    <span className="text-lg font-semibold">
                       {movie.imdbRating}
                     </span>
                   </div>
@@ -160,11 +170,11 @@ const MovieDetails = ({ params }) => {
                     </span>
                   </p>
                   <p className="text-md text-gray-500 dark:text-gray-400 mb-4">
-                    <strong className="text-purple-700">Released:-</strong>{" "}
+                    <strong className="text-purple-700">Released:</strong>{" "}
                     {movie.Released} 🎉
                   </p>
                   <p className="text-md text-gray-500 dark:text-gray-400 mb-4">
-                    <strong className="text-purple-700">Runtime:-</strong>{" "}
+                    <strong className="text-purple-700">Runtime:</strong>{" "}
                     {movie.Runtime} ⏳
                   </p>
 
@@ -207,68 +217,60 @@ const MovieDetails = ({ params }) => {
               </Card>
             </motion.div>
 
-            {/* Right Column: Trailer, Movie Title and Basic Info */}
+            {/* Right Column: Trailer and Extra Details */}
             <motion.div className="lg:w-2/3" variants={itemVariants}>
               {/* Trailer Section */}
-              <Card className="shadow-lg mb-6  dark:bg-gray-800">
+              <Card className="shadow-lg mb-6 dark:bg-gray-800">
                 <h2 className="text-lg font-semibold text-purple-700 p-4 border-b border-gray-200 dark:border-gray-700">
                   Watch Trailer 🎥
                 </h2>
                 <div className="p-4">
                   {trailerUrl ? (
                     <div className="relative w-full h-0 pb-[56.25%]">
-                      {" "}
-                      {/* 16:9 Aspect Ratio */}
                       <iframe
                         className="absolute top-0 left-0 w-full h-full rounded-lg"
                         src={`https://www.youtube.com/embed/${trailerUrl}`}
                         title={`Trailer for ${movie.Title}`}
-                        style={{ border: "none" }}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        frameBorder="0"
                         allowFullScreen
                       ></iframe>
                     </div>
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-400 text-center">
-                      Trailer Not Available 🚫
+                    <p className="text-center text-gray-500 dark:text-gray-400">
+                      No trailer available.
                     </p>
                   )}
                 </div>
               </Card>
-
               {/* Plot Summary */}
-              <Card className="shadow-lg mb-6  dark:bg-gray-800">
+              <Card className="shadow-lg mb-6 dark:bg-gray-800">
                 <h2 className="text-lg font-semibold text-purple-700 p-4 border-b border-gray-200 dark:border-gray-700">
-                  Plot Summary 📜
+                  Plot Summary 📝
                 </h2>
                 <div className="p-4">
-                  <p className="text-md text-gray-600 dark:text-gray-300 text-justify">
+                  <p className="text-md text-gray-600 dark:text-gray-400">
                     {movie.Plot}
                   </p>
                 </div>
               </Card>
-
-              {/* Ratings Section */}
-              <Card className="shadow-lg  dark:bg-gray-800">
+              {/* Extra Details Section */}
+              <Card className="shadow-lg mb-6 dark:bg-gray-800">
                 <h2 className="text-lg font-semibold text-purple-700 p-4 border-b border-gray-200 dark:border-gray-700">
-                  Ratings & Stats 📊
+                  Extra Details 📜
                 </h2>
                 <div className="p-4">
-                  <p className="text-md text-gray-600 dark:text-gray-300 mb-2">
-                    <strong className="text-purple-700">Awards :-</strong>{" "}
-                    {movie.Awards} 🏆
+                  <p className="text-md text-gray-600 dark:text-gray-400 mb-2">
+                    <strong className="text-purple-700">Director:-</strong>{" "}
+                    {movie.Director}
                   </p>
-                  <ul className="space-y-2">
-                    {movie.Ratings.map((rating) => (
-                      <li
-                        key={rating.Source}
-                        className="text-sm text-gray-600 dark:text-gray-300 flex justify-between"
-                      >
-                        <span>{rating.Source}</span>
-                        <span>{rating.Value}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="text-md text-gray-600 dark:text-gray-400 mb-2">
+                    <strong className="text-purple-700">Actors:</strong>{" "}
+                    {movie.Actors}
+                  </p>
+                  <p className="text-md text-gray-600 dark:text-gray-400 mb-2">
+                    <strong className="text-purple-700">Awards:-</strong>{" "}
+                    {movie.Awards}
+                  </p>
                 </div>
               </Card>
             </motion.div>

@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMoviesByGenre, setPage } from "@/store/slices/movieSlice";
-import { Card, Spinner, Pagination } from "flowbite-react";
+import { Card, Spinner, Pagination, Button } from "flowbite-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -106,7 +106,7 @@ const MovieCardSection = () => {
             {paginatedMovies.map((movie, i) => (
               <Link href={`/movies/${movie.imdbID}`} key={movie.imdbID}>
                 <motion.div custom={i} variants={cardVariants}>
-                  <Card className="bg-gray-200 dark:bg-gray-800 shadow-lg">
+                  <Card className=" dark:bg-gray-800 shadow-lg">
                     <Image
                       className="w-full h-60 rounded-t-lg object-fill"
                       src={movie.Poster}
@@ -161,6 +161,19 @@ const MovieCardSection = () => {
       {renderMoviesSection("action", action)}
       {renderMoviesSection("adventure", adventure)}
       {renderMoviesSection("comedy", comedy)}
+      {/* Explore More Button */}
+      <motion.div
+        className="flex justify-center animate-pulse-smooth mt-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Link href="/movies">
+          <Button outline gradientDuoTone="purpleToBlue">
+            Explore More
+          </Button>
+        </Link>
+      </motion.div>
     </div>
   );
 };

@@ -16,7 +16,7 @@ const TestimonialSection = () => {
 
   useEffect(() => {
     if (status === "idle") {
-      dispatch(fetchTestimonials()); // Fetch testimonials when the status is idle
+      dispatch(fetchTestimonials());
     }
   }, [dispatch, status]);
 
@@ -44,13 +44,15 @@ const TestimonialSection = () => {
 
   return (
     <motion.section
-      className="pt-16 pb-20 flex flex-col items-center justify-center mb-20"
+      className="pt-16 pb-20 flex flex-col items-center justify-center  bg-white dark:bg-gray-900"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, delay: 0.3 }}
     >
-      <div className="text-center px-4 sm:px-8 lg:px-12">
-        <h2 className="text-4xl font-bold mb-10">What Our Users Are Saying</h2>
+      <div className="text-center px-4 sm:px-8 lg:px-12 ">
+        <h2 className="text-4xl font-bold mb-10 text-purple-700">
+          What Our Users Are Saying
+        </h2>
         <p className="text-lg text-justify mb-10 text-gray-700 dark:text-gray-300">
           🌟 Discover why Cinestream is loved by our users! 🎬 Hear their
           feedback on our exceptional service and diverse movie selection. 🍿✨
@@ -110,7 +112,7 @@ const TestimonialSection = () => {
             ))}
           </Carousel>
         </div>
-        <TestimonialForm/>
+        <TestimonialForm />
       </div>
     </motion.section>
   );
