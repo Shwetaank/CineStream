@@ -13,6 +13,14 @@ import { motion } from "framer-motion";
 const Footer = () => {
   const router = useRouter();
 
+  // Define your navigation links consistently
+  const navLinks = [
+    { path: "/movies", label: "Movies" },
+    { path: "/tv-series", label: "Tv Series" },
+    { path: "/bookmark", label: "Bookmarks" },
+    { path: "/about", label: "About Us" },
+  ];
+
   return (
     <FlowbiteFooter container>
       <motion.div
@@ -21,7 +29,6 @@ const Footer = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Brand Logo and Navigation Links */}
         <motion.div
           className="flex flex-col sm:flex-row sm:justify-between"
           initial={{ y: -20 }}
@@ -35,31 +42,21 @@ const Footer = () => {
             className="cursor-pointer mb-4 sm:mb-0"
           />
           <FlowbiteFooter.LinkGroup className="flex font-semibold md:gap-8 sm:text-lg md:2xl flex-row justify-center space-x-4 sm:mb-0 cursor-pointer">
-            {/* Navigation Links */}
-            {["/movies", "/tv-Series", "/bookmarks", "/about"].map(
-              (path, index) => (
-                <FlowbiteFooter.Link
-                  key={index}
-                  onClick={() => router.push(path)}
-                  className="hover:text-purple-600 transition duration-200"
-                >
-                  {path === "/movies"
-                    ? "Movies"
-                    : path === "/tv-Series"
-                    ? "TV-Series"
-                    : path === "/bookmarks"
-                    ? "Bookmarks"
-                    : "About Us"}
-                </FlowbiteFooter.Link>
-              )
-            )}
+            {/* Render navigation links using consistent casing */}
+            {navLinks.map(({ path, label }, index) => (
+              <FlowbiteFooter.Link
+                key={index}
+                onClick={() => router.push(path)}
+                className="hover:text-purple-600 transition duration-200"
+              >
+                {label} {/* Ensure label matches the server's rendered text */}
+              </FlowbiteFooter.Link>
+            ))}
           </FlowbiteFooter.LinkGroup>
         </motion.div>
 
-        {/* Divider for visual separation */}
         <FlowbiteFooter.Divider />
 
-        {/* Copyright and Social Media Links */}
         <motion.div
           className="flex flex-col sm:flex-row sm:justify-between"
           initial={{ y: 20 }}
@@ -72,7 +69,6 @@ const Footer = () => {
             year={new Date().getFullYear()}
           />
           <div className="mt-4 flex md:gap-10 justify-center space-x-8 sm:mt-0">
-            {/* Social Media Icons */}
             {[
               {
                 href: "https://www.linkedin.com/in/shwetank-morey-a35484257",

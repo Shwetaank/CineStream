@@ -140,7 +140,7 @@ const MovieDetails = ({ params }) => {
               <Card className="shadow-lg mb-6 dark:bg-gray-800">
                 <Image
                   className="object-fill w-full h-[500px] rounded-lg"
-                  src={movie.Poster}
+                  src={series.Poster !== "N/A" && series.Poster ? series.Poster : "/fallback.png"}
                   alt={`${movie.Title} Poster`}
                   width={600}
                   height={900}

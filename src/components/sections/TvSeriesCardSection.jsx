@@ -113,7 +113,7 @@ const TvSeriesCardSection = () => {
                   <Card className="bg-gray-200 dark:bg-gray-800 shadow-lg">
                     <Image
                       className="w-full h-60 rounded-t-lg object-fill"
-                      src={series.Poster}
+                      src={series.Poster !== "N/A" ? series.Poster : "/fallback.png"} 
                       alt={`${series.Title} Poster`}
                       width={300}
                       height={320}
@@ -161,9 +161,7 @@ const TvSeriesCardSection = () => {
 
   return (
     <div className="pt-16 pb-20 px-4 sm:px-6 md:px-10 lg:px-12 bg-gray-50 dark:bg-gray-900">
-      <h2 className="text-4xl font-bold mb-6 text-center text-purple-700">
-        Explore TV Series
-      </h2>
+      <h2 className="text-4xl font-bold mb-6 text-center text-purple-700">Explore TV Series</h2>
       {renderTvSeriesSection("drama", drama)}
       {renderTvSeriesSection("horror", horror)}
       {renderTvSeriesSection("thriller", thriller)}

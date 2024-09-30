@@ -8,64 +8,68 @@ export const fetchTvSeriesByGenre = createAsyncThunk(
     const apiKey = process.env.NEXT_PUBLIC_OMDB_API_KEY;
     if (!apiKey) throw new Error("API key is missing");
 
-    const response = await axios.get(
-      `https://www.omdbapi.com/?s=${genre}&page=${currentPage}&type=series&apikey=${apiKey}`
-    );
+    const responses = await Promise.all([
+      axios.get(
+        `https://www.omdbapi.com/?s=${genre}&page=${currentPage}&type=series&apikey=${apiKey}`
+      ),
+      axios.get(
+        `https://www.omdbapi.com/?s=${genre}&page=${
+          currentPage + 1
+        }&type=series&apikey=${apiKey}`
+      ),
+    ]);
 
-    if (response.data.Response === "True") {
-      const detailedSeries = await Promise.all(
-        response.data.Search.map((series) =>
+    const series = [];
+
+    responses.forEach((response) => {
+      if (response.data.Response === "True") {
+        const detailedSeries = response.data.Search.map((series) =>
           axios.get(
             `https://www.omdbapi.com/?i=${series.imdbID}&apikey=${apiKey}`
           )
-        )
-      );
+        );
 
-      return {
-        genre,
-        series: detailedSeries.map((series) => series.data),
-        totalResults: response.data.totalResults,
-      };
-    }
+        series.push(...detailedSeries);
+      }
+    });
 
-    throw new Error("TV series not found");
-  }
-);
+    // Wait for all detailed series requests to finish
+    const detailedSeries = await Promise.all(series);
 
-// Async thunk to fetch a random TV series
-export const fetchRandomTvSeries = createAsyncThunk(
-  "tvSeries/fetchRandomTvSeries",
-  async () => {
-    const apiKey = process.env.NEXT_PUBLIC_OMDB_API_KEY;
-    if (!apiKey) throw new Error("API key is missing");
+    // Sort series by release year in descending order
+    const sortedSeries = detailedSeries
+      .map((series) => series.data)
+      .sort((a, b) => {
+        const yearA = parseInt(a.Released.split(" ")[2]) || 0; // Extract year
+        const yearB = parseInt(b.Released.split(" ")[2]) || 0; // Extract year
+        return yearB - yearA; // Sort descending
+      });
 
-    // Generate a random year or a random genre to get a random TV series
-    const randomYear = Math.floor(Math.random() * (2023 - 1950 + 1)) + 1950; // Random year between 1950 and 2023
-    const response = await axios.get(
-      `https://www.omdbapi.com/?s=series&y=${randomYear}&type=series&apikey=${apiKey}`
-    );
-
-    if (response.data.Response === "True") {
-      // Select a random series from the fetched results
-      const randomSeries =
-        response.data.Search[
-          Math.floor(Math.random() * response.data.Search.length)
-        ];
-
-      const detailedSeriesResponse = await axios.get(
-        `https://www.omdbapi.com/?i=${randomSeries.imdbID}&apikey=${apiKey}`
-      );
-
-      return detailedSeriesResponse.data;
-    }
-
-    throw new Error("Random TV series not found");
+    return {
+      genre,
+      series: sortedSeries.slice(0, 20), // Return only the first 20 series
+      totalResults: sortedSeries.length,
+    };
   }
 );
 
 const tvSlice = createSlice({
   name: "tvSeries",
   initialState: {
+    action: {
+      data: [],
+      loading: false,
+      error: null,
+      currentPage: 1,
+      totalResults: 0,
+    },
+    comedy: {
+      data: [],
+      loading: false,
+      error: null,
+      currentPage: 1,
+      totalResults: 0,
+    },
     drama: {
       data: [],
       loading: false,
@@ -80,6 +84,13 @@ const tvSlice = createSlice({
       currentPage: 1,
       totalResults: 0,
     },
+    romance: {
+      data: [],
+      loading: false,
+      error: null,
+      currentPage: 1,
+      totalResults: 0,
+    },
     thriller: {
       data: [],
       loading: false,
@@ -87,7 +98,27 @@ const tvSlice = createSlice({
       currentPage: 1,
       totalResults: 0,
     },
-    random: { data: null, loading: false, error: null },
+    sciFi: {
+      data: [],
+      loading: false,
+      error: null,
+      currentPage: 1,
+      totalResults: 0,
+    },
+    fantasy: {
+      data: [],
+      loading: false,
+      error: null,
+      currentPage: 1,
+      totalResults: 0,
+    },
+    animation: {
+      data: [],
+      loading: false,
+      error: null,
+      currentPage: 1,
+      totalResults: 0,
+    },
   },
   reducers: {
     setPage: (state, action) => {
@@ -101,9 +132,6 @@ const tvSlice = createSlice({
         state[genre].loading = false;
         state[genre].error = null;
       });
-      state.random.data = null;
-      state.random.loading = false;
-      state.random.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -123,18 +151,6 @@ const tvSlice = createSlice({
         const genre = action.meta.arg.genre;
         state[genre].loading = false;
         state[genre].error = action.error.message;
-      })
-      .addCase(fetchRandomTvSeries.pending, (state) => {
-        state.random.loading = true;
-        state.random.error = null;
-      })
-      .addCase(fetchRandomTvSeries.fulfilled, (state, action) => {
-        state.random.data = action.payload;
-        state.random.loading = false;
-      })
-      .addCase(fetchRandomTvSeries.rejected, (state, action) => {
-        state.random.loading = false;
-        state.random.error = action.error.message;
       });
   },
 });
