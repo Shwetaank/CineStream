@@ -1,40 +1,25 @@
+// components/Header.js
 "use client";
-import { Button, DarkThemeToggle, Navbar, NavbarToggle, TextInput } from "flowbite-react";
+import { Button, DarkThemeToggle, Navbar, NavbarToggle } from "flowbite-react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { HiOutlineArrowRight, HiOutlineSearch } from "react-icons/hi";
+import { HiOutlineArrowRight } from "react-icons/hi";
 import { useUser, UserButton } from "@clerk/nextjs";
-import { useState } from "react";
 import { motion } from "framer-motion";
+import Search from "../search/Search";
 
 const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { isSignedIn } = useUser();
-  const [searchQuery, setSearchQuery] = useState("");
 
-  // Navigation links for the app
   const navLinks = [
     { path: "/movies", label: "Movies" },
     { path: "/tv-series", label: "Tv Series" },
     { path: "/bookmark", label: "Bookmarks" },
   ];
 
-  // Check if the current path is active
   const isActive = (path) => pathname === path;
-
-  // Handle search submission
-  const handleSearch = () => {
-    if (searchQuery) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery("");
-    }
-  };
-
-  // Handle 'Enter' key press for search
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") handleSearch();
-  };
 
   return (
     <motion.div
@@ -43,7 +28,6 @@ const Header = () => {
       transition={{ duration: 1, ease: "easeInOut" }}
     >
       <Navbar fluid rounded className="w-full text-center p-4">
-        {/* Brand logo with click functionality */}
         <motion.div
           initial={{ x: -100 }}
           animate={{ x: 0 }}
@@ -67,21 +51,12 @@ const Header = () => {
           transition={{ duration: 0.7, ease: "easeInOut" }}
           className="hidden md:block max-w-md md:mx-auto"
         >
-          <TextInput
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-            rightIcon={HiOutlineSearch}
-            onKeyDown={handleKeyDown}
-          />
+          <Search /> {/* Use Search component */}
         </motion.div>
 
-        {/* User action buttons and toggles */}
         <div className="flex items-center gap-4">
           {isSignedIn ? (
             <>
-              {/* Navigation links for signed-in users */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -92,7 +67,9 @@ const Header = () => {
                   <div
                     key={path}
                     className={`cursor-pointer ${
-                      isActive(path) ? "text-blue-500 font-bold" : "hover:text-purple-700 hover:underline"
+                      isActive(path)
+                        ? "text-blue-500 font-bold"
+                        : "hover:text-purple-700 hover:underline"
                     } transition-colors duration-300`}
                     onClick={() => router.push(path)}
                   >
@@ -101,7 +78,6 @@ const Header = () => {
                 ))}
               </motion.div>
 
-              {/* User profile button */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -132,7 +108,7 @@ const Header = () => {
             transition={{ duration: 0.7, ease: "easeInOut" }}
           >
             <DarkThemeToggle />
-            <NavbarToggle/>
+            <NavbarToggle />
           </motion.div>
         </div>
 
@@ -144,15 +120,7 @@ const Header = () => {
             transition={{ duration: 0.7, ease: "easeInOut" }}
             className="md:hidden flex flex-col items-center p-4 w-full"
           >
-            <TextInput
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search..."
-              rightIcon={HiOutlineSearch}
-              onKeyDown={handleKeyDown}
-              className="w-full"
-            />
+            <Search /> {/* Use Search component */}
           </motion.div>
         )}
 
