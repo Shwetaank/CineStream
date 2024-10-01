@@ -24,7 +24,7 @@ const MainPage = () => {
         <TestimonialSection />
       </section>
       <section id="action">
-        <ActionSection/>
+        <ActionSection />
       </section>
     </main>
   );

@@ -140,7 +140,7 @@ const MovieDetails = ({ params }) => {
               <Card className="shadow-lg mb-6 dark:bg-gray-800">
                 <Image
                   className="object-fill w-full h-[500px] rounded-lg"
-                  src={series.Poster !== "N/A" && series.Poster ? series.Poster : "/fallback.png"}
+                  src={movie.Poster !== "N/A" ? movie.Poster : "/fallback.png"}
                   alt={`${movie.Title} Poster`}
                   width={600}
                   height={900}
@@ -245,31 +245,28 @@ const MovieDetails = ({ params }) => {
               {/* Plot Summary */}
               <Card className="shadow-lg mb-6 dark:bg-gray-800">
                 <h2 className="text-lg font-semibold text-purple-700 p-4 border-b border-gray-200 dark:border-gray-700">
-                  Plot Summary 📝
+                  Plot Summary 📜
                 </h2>
                 <div className="p-4">
-                  <p className="text-md text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-500 dark:text-gray-400">
                     {movie.Plot}
                   </p>
                 </div>
               </Card>
-              {/* Extra Details Section */}
+              {/* Additional Info */}
               <Card className="shadow-lg mb-6 dark:bg-gray-800">
                 <h2 className="text-lg font-semibold text-purple-700 p-4 border-b border-gray-200 dark:border-gray-700">
-                  Extra Details 📜
+                  Additional Information ℹ️
                 </h2>
                 <div className="p-4">
-                  <p className="text-md text-gray-600 dark:text-gray-400 mb-2">
-                    <strong className="text-purple-700">Director:-</strong>{" "}
-                    {movie.Director}
+                  <p className="text-md text-gray-500 dark:text-gray-400">
+                    <strong>Director:</strong> {movie.Director}
                   </p>
-                  <p className="text-md text-gray-600 dark:text-gray-400 mb-2">
-                    <strong className="text-purple-700">Actors:</strong>{" "}
-                    {movie.Actors}
+                  <p className="text-md text-gray-500 dark:text-gray-400">
+                    <strong>Actors:</strong> {movie.Actors}
                   </p>
-                  <p className="text-md text-gray-600 dark:text-gray-400 mb-2">
-                    <strong className="text-purple-700">Awards:-</strong>{" "}
-                    {movie.Awards}
+                  <p className="text-md text-gray-500 dark:text-gray-400">
+                    <strong>Awards:</strong> {movie.Awards}
                   </p>
                 </div>
               </Card>

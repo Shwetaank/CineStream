@@ -54,7 +54,7 @@ const MainMoviePage = () => {
       "animation",
     ];
     genres.forEach((genre) => {
-      dispatch(fetchMoviesByGenre({ genre, currentPage: 1 })); // Fetch from page 1 for each genre
+      dispatch(fetchMoviesByGenre({ genre, currentPage: 1 })); 
     });
   }, [dispatch]);
 
@@ -73,7 +73,7 @@ const MainMoviePage = () => {
 
     // Animation variants for motion
     const cardVariants = {
-      hidden: { opacity: 0, scale: 0.9 }, // Start with scale 0.9 and invisible
+      hidden: { opacity: 0, scale: 0.9 }, 
       visible: {
         opacity: 1,
         scale: 1,

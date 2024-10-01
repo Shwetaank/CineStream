@@ -2,7 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import MovieCard from "@/components/movieCard/MovieCard"; 
+import MovieCard from "@/components/movieCard/MovieCard";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
@@ -18,7 +18,11 @@ const SearchPage = () => {
 
       // Fetch search results from OMDB API
       axios
-        .get(`https://www.omdbapi.com/?apikey=8e4a477f&s=${encodeURIComponent(query)}`)
+        .get(
+          `https://www.omdbapi.com/?apikey=8e4a477f&s=${encodeURIComponent(
+            query
+          )}`
+        )
         .then((response) => {
           console.log(response.data); // Log the API response to inspect it
           if (response.data.Response === "True") {
@@ -40,7 +44,9 @@ const SearchPage = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Search Results for &quot;{query}&quot;</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        Search Results for &quot;{query}&quot;
+      </h1>
       {loading ? (
         <p>Loading...</p>
       ) : error ? (

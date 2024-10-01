@@ -1,11 +1,10 @@
-// components/MovieCard.js
 import Image from "next/image";
 
 const MovieCard = ({ movie }) => {
   return (
     <div className="border rounded-lg p-2 shadow-md">
       <Image
-        src={movie.Poster !== "N/A" ? movie.Poster : "/no-image.png"}
+        src={movie.Poster !== "N/A" ? movie.Poster : "/fallback.png"}
         alt={movie.Title}
         width={150}
         height={200}

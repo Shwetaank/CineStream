@@ -1,4 +1,4 @@
-"use client"; // Ensure this is a Client Component
+"use client"; 
 
 import { Button } from "flowbite-react";
 import { useUser } from "@clerk/nextjs";
@@ -26,7 +26,7 @@ const ActionSection = () => {
   return (
     <div className="w-full flex flex-col md:flex-row justify-between items-center p-6 md:p-8 rounded-lg shadow-lg">
       <motion.div
-        className="mb-4 md:mb-0 md:mr-4 p-4 text-gray-800"
+        className="mb-4 md:mb-0 md:mr-4 p-4 "
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}

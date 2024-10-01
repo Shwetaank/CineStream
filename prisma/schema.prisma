@@ -7,36 +7,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Movie {
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId
-  imageString   String
-  title         String
-  ageRating     Int // Consider renaming for clarity
-  duration      Int // Use Int if dealing with whole numbers
-  overview      String
-  release       Int
-  videoSource   String
-  category      String
-  youtubeString String
-  Bookmarks     Bookmark[] @relation("MovieBookmark")
-
-  createdAt DateTime @default(now())
-}
-
-model Bookmark {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String
-
-  movieId String? @db.ObjectId
-  Movie   Movie?  @relation(fields: [movieId], references: [id], name: "MovieBookmark")
-}
-
 model Testimonials {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String
   emailID   String?
   avatar    String
   rating    Float
-  remark    String 
+  remark    String
   createdAt DateTime @default(now())
+}
+
+model User {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  bookmarks Bookmark[]
+}
+
+model Movie {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  imdbID    String     @unique
+  title     String
+  poster    String
+  genre     String
+  year      String
+  bookmarks Bookmark[]
+}
+
+model TvSeries {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  imdbID    String     @unique
+  title     String
+  poster    String
+  genre     String
+  year      String
+  bookmarks Bookmark[]
+}
+
+model Bookmark {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  movieId    String?  @db.ObjectId
+  tvSeriesId String?  @db.ObjectId
+  createdAt  DateTime @default(now())
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id])
+  movie    Movie?    @relation(fields: [movieId], references: [id])
+  tvSeries TvSeries? @relation(fields: [tvSeriesId], references: [id])
 }
