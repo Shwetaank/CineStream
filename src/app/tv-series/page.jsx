@@ -2,13 +2,13 @@
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTvSeriesByGenre, setPage } from "@/store/slices/tvSeriesSlice";
-import { Card, Spinner, Pagination } from "flowbite-react";
+import { addBookmark } from "@/store/slices/bookmarkSlice";
+import { Card, Spinner, Pagination, Alert } from "flowbite-react"; 
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FaInfoCircle } from "react-icons/fa";
+import { FaInfoCircle, FaBookmark, FaRegBookmark } from "react-icons/fa";
 
-// Custom hook for detecting window size
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 0,
@@ -38,11 +38,14 @@ const MainTvSeriesPage = () => {
     fantasy,
     animation,
   } = useSelector((state) => state.tvSeries);
-
+  const { bookmarks } = useSelector((state) => state.bookmarks);
   const { width } = useWindowSize();
   const seriesPerPage = useMemo(() => (width <= 640 ? 1 : 4), [width]);
 
-  // Fetch TV series when the component mounts
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("");
+
   useEffect(() => {
     const genres = [
       "action",
@@ -56,13 +59,27 @@ const MainTvSeriesPage = () => {
       "animation",
     ];
     genres.forEach((genre) => {
-      dispatch(fetchTvSeriesByGenre({ genre, currentPage: 1 })); // Fetch from page 1 for each genre
+      dispatch(fetchTvSeriesByGenre({ genre, currentPage: 1 }));
     });
   }, [dispatch]);
 
   const handlePageChange = (genre, page) => {
     dispatch(setPage({ genre, page }));
     dispatch(fetchTvSeriesByGenre({ genre, currentPage: page }));
+  };
+
+  const handleBookmarkToggle = (tvSeries) => {
+    const isBookmarked = bookmarks.some(
+      (bookmark) => bookmark.tvSeriesId === tvSeries.imdbID
+    );
+
+    if (!isBookmarked) {
+      dispatch(addBookmark({ tvSeriesId: tvSeries.imdbID })).then(() => {
+        setAlertMessage("Bookmark added to favorites!");
+        setAlertColor("success");
+        setAlertVisible(true);
+      });
+    }
   };
 
   const renderTvSeriesSection = (genre, tvSeriesData) => {
@@ -72,15 +89,6 @@ const MainTvSeriesPage = () => {
       currentPage * seriesPerPage
     );
     const totalPages = Math.ceil(totalResults / seriesPerPage);
-
-    const cardVariants = {
-      hidden: { opacity: 0, scale: 0.9 },
-      visible: {
-        opacity: 1,
-        scale: 1,
-        transition: { duration: 0.3, ease: "easeInOut" },
-      },
-    };
 
     return (
       <div className="mb-12">
@@ -135,7 +143,7 @@ const MainTvSeriesPage = () => {
                     <strong>Plot:</strong> {series.Plot || "N/A"}
                   </p>
                 </div>
-                <div className="flex justify-center p-4">
+                <div className="flex justify-between p-4">
                   <Link
                     href={`/tv-series/${series.imdbID}`}
                     className="flex items-center text-purple-700"
@@ -143,6 +151,18 @@ const MainTvSeriesPage = () => {
                     <FaInfoCircle className="mr-2" />
                     <span>See More</span>
                   </Link>
+                  <button
+                    onClick={() => handleBookmarkToggle(series)}
+                    aria-label="Bookmark TV series"
+                  >
+                    {bookmarks.some(
+                      (bookmark) => bookmark.tvSeriesId === series.imdbID
+                    ) ? (
+                      <FaBookmark className="text-purple-700" />
+                    ) : (
+                      <FaRegBookmark className="text-gray-400" />
+                    )}
+                  </button>
                 </div>
               </Card>
             ))}
@@ -174,6 +194,15 @@ const MainTvSeriesPage = () => {
       {renderTvSeriesSection("sciFi", sciFi)}
       {renderTvSeriesSection("fantasy", fantasy)}
       {renderTvSeriesSection("animation", animation)}
+
+      {/* Alert Notification */}
+      {alertVisible && (
+        <div className="fixed top-16 right-4 z-50">
+          <Alert color={alertColor} onDismiss={() => setAlertVisible(false)}>
+            {alertMessage}
+          </Alert>
+        </div>
+      )}
     </div>
   );
 };

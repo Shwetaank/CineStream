@@ -12,56 +12,65 @@ const SearchPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (query) {
+    const fetchMovies = async () => {
+      if (!query) return; // Early return if no query
+
       setLoading(true);
       setError(null); // Reset error state on new search
 
-      // Fetch search results from OMDB API
-      axios
-        .get(
-          `https://www.omdbapi.com/?apikey=8e4a477f&s=${encodeURIComponent(
-            query
-          )}`
-        )
-        .then((response) => {
-          console.log(response.data); // Log the API response to inspect it
-          if (response.data.Response === "True") {
-            setResults(response.data.Search);
-          } else {
-            setResults([]); // No results found
-            setError(response.data.Error); // Set the error message from API
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching data from OMDB", error);
-          setError("Failed to fetch data");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+      try {
+        // Fetch initial movie search results
+        const { data } = await axios.get(
+          `https://www.omdbapi.com/?apikey=${process.env.NEXT_PUBLIC_OMDB_API_KEY}&s=${encodeURIComponent(query)}`
+        );
+
+        console.log(data); // Log the full response for debugging
+
+        if (data.Response === "True") {
+          // Fetch detailed information for each movie
+          const detailedResults = await Promise.all(
+            data.Search.map(async (movie) => {
+              const detailResponse = await axios.get(
+                `https://www.omdbapi.com/?apikey=${process.env.NEXT_PUBLIC_OMDB_API_KEY}&i=${movie.imdbID}`
+              );
+              return detailResponse.data;
+            })
+          );
+          setResults(detailedResults);
+        } else {
+          setResults([]); // No results found
+          setError(data.Error); // Set error message from API
+        }
+      } catch (error) {
+        console.error("Error fetching data from OMDB", error);
+        setError("Failed to fetch data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
   }, [query]);
+
+  const renderResults = () => {
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p className="text-red-500">{error}</p>;
+
+    return results.length > 0 ? (
+      results.map((movie, index) => <MovieCard key={movie.imdbID} movie={movie} index={index} />)
+    ) : (
+      <p>No results found</p>
+    );
+  };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">
         Search Results for &quot;{query}&quot;
       </h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {results.length > 0 ? (
-            results.map((movie) => (
-              <MovieCard key={movie.imdbID} movie={movie} />
-            ))
-          ) : (
-            <p>No results found</p>
-          )}
-        </div>
-      )}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {renderResults()}
+      </div>
     </div>
   );
 };

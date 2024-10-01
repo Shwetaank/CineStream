@@ -116,7 +116,6 @@ const BookmarkPage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Spinner color="purple" size="xl" />
-        <p className="text-gray-600 mt-4">Loading bookmarks...</p>
       </div>
     );
   }
@@ -127,7 +126,7 @@ const BookmarkPage = () => {
 
   return (
     <div className="pt-16 pb-20 px-4 sm:px-6 md:px-10 lg:px-12">
-      <h2 className="text-4xl font-bold mb-6 text-center">My Bookmarks</h2>
+      <h2 className="text-4xl font-semibold mb-10 text-center">My Bookmarks</h2>
       {bookmarks.length === 0 ? (
         <p className="text-center text-gray-600">No bookmarks found.</p>
       ) : (
@@ -162,9 +161,9 @@ const BookmarkPage = () => {
                       />
                       <button
                         onClick={() => handleDeleteBookmark(bookmark.id)}
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                        className="absolute top-2 right-2 text-purple-500 hover:text-purple-700"
                       >
-                        <FiTrash size={24} />
+                        <FiTrash size={30} />
                       </button>
                     </div>
                     <div className="p-4">
@@ -192,7 +191,7 @@ const BookmarkPage = () => {
                       <div className="flex justify-end mt-4">
                         <Link href={`/movies/${movieId}`}>
                           <button className="text-purple-700 hover:text-purple-900">
-                            <FiInfo size={24} />
+                            <FiInfo size={30} />
                           </button>
                         </Link>
                       </div>
@@ -216,16 +215,16 @@ const BookmarkPage = () => {
         </>
       )}
 
-      <Modal show={confirmationVisible} onClose={cancelDelete}>
+      <Modal popup show={confirmationVisible} onClose={cancelDelete}>
         <Modal.Header>Confirm Deletion</Modal.Header>
         <Modal.Body>
           <p>Are you sure you want to delete this bookmark?</p>
         </Modal.Body>
-        <Modal.Footer>
-          <Button color="red" onClick={confirmDelete}>
+        <Modal.Footer className="flex justify-end">
+          <Button color="failure" pill onClick={confirmDelete}>
             Yes, delete
           </Button>
-          <Button color="gray" onClick={cancelDelete}>
+          <Button color="success" pill onClick={cancelDelete}>
             Cancel
           </Button>
         </Modal.Footer>
