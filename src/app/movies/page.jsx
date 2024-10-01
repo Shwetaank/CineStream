@@ -2,12 +2,13 @@
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMoviesByGenre, setPage } from "@/store/slices/movieSlice";
-import { Card, Spinner, Pagination } from "flowbite-react";
+import { addBookmark } from "@/store/slices/bookmarkSlice";
+import { Card, Spinner, Pagination, Alert} from "flowbite-react"; 
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { FaInfoCircle, FaBookmark, FaRegBookmark } from "react-icons/fa";
 
-// Custom hook for detecting window size
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 0,
@@ -37,10 +38,14 @@ const MainMoviePage = () => {
     fantasy,
     animation,
   } = useSelector((state) => state.movies);
+  const { bookmarks } = useSelector((state) => state.bookmarks);
   const { width } = useWindowSize();
   const moviesPerPage = useMemo(() => (width <= 640 ? 1 : 4), [width]);
 
-  // Fetch movies when the component mounts
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("");
+
   useEffect(() => {
     const genres = [
       "action",
@@ -54,13 +59,27 @@ const MainMoviePage = () => {
       "animation",
     ];
     genres.forEach((genre) => {
-      dispatch(fetchMoviesByGenre({ genre, currentPage: 1 })); 
+      dispatch(fetchMoviesByGenre({ genre, currentPage: 1 }));
     });
   }, [dispatch]);
 
   const handlePageChange = (genre, page) => {
     dispatch(setPage({ genre, page }));
     dispatch(fetchMoviesByGenre({ genre, currentPage: page }));
+  };
+
+  const handleBookmarkToggle = (movie) => {
+    const isBookmarked = bookmarks.some(
+      (bookmark) => bookmark.movieId === movie.imdbID
+    );
+
+    if (!isBookmarked) {
+      dispatch(addBookmark({ movieId: movie.imdbID })).then(() => {
+        setAlertMessage("Bookmark added to favorites!");
+        setAlertColor("success");
+        setAlertVisible(true);
+      });
+    }
   };
 
   const renderMoviesSection = (genre, moviesData) => {
@@ -70,16 +89,6 @@ const MainMoviePage = () => {
       currentPage * moviesPerPage
     );
     const totalPages = Math.ceil(totalResults / moviesPerPage);
-
-    // Animation variants for motion
-    const cardVariants = {
-      hidden: { opacity: 0, scale: 0.9 }, 
-      visible: {
-        opacity: 1,
-        scale: 1,
-        transition: { duration: 0.3, ease: "easeInOut" },
-      },
-    };
 
     return (
       <div className="mb-12">
@@ -102,43 +111,58 @@ const MainMoviePage = () => {
             initial="hidden"
             animate="visible"
           >
-            {paginatedMovies.map((movie, i) => (
-              <Link href={`/movies/${movie.imdbID}`} key={movie.imdbID}>
-                <motion.div variants={cardVariants}>
-                  <Card className=" dark:bg-gray-800 shadow-lg">
-                    <Image
-                      className="w-full h-60 rounded-t-lg object-fill"
-                      src={
-                        movie.Poster !== "N/A" ? movie.Poster : "/fallback.png"
-                      }
-                      alt={`${movie.Title} Poster`}
-                      width={300}
-                      height={320}
-                      priority
-                    />
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold text-purple-700">
-                        {movie.Title} ({movie.Year})
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <strong>Rated:</strong> {movie.Rated || "N/A"}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <strong>Genre:</strong> {movie.Genre || "N/A"}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <strong>Runtime:</strong> {movie.Runtime || "N/A"}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <strong>Released:</strong> {movie.Released || "N/A"}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-justify">
-                        <strong>Plot:</strong> {movie.Plot || "N/A"}
-                      </p>
-                    </div>
-                  </Card>
-                </motion.div>
-              </Link>
+            {paginatedMovies.map((movie) => (
+              <Card className="dark:bg-gray-800 shadow-lg" key={movie.imdbID}>
+                <Image
+                  className="w-full h-60 rounded-t-lg object-fill"
+                  src={movie.Poster !== "N/A" ? movie.Poster : "/fallback.png"}
+                  alt={`${movie.Title} Poster`}
+                  width={300}
+                  height={320}
+                  priority
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-purple-700">
+                    {movie.Title} ({movie.Year})
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <strong>Rated:</strong> {movie.Rated || "N/A"}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <strong>Genre:</strong> {movie.Genre || "N/A"}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <strong>Runtime:</strong> {movie.Runtime || "N/A"}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <strong>Released:</strong> {movie.Released || "N/A"}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-justify">
+                    <strong>Plot:</strong> {movie.Plot || "N/A"}
+                  </p>
+                </div>
+                <div className="flex justify-between p-4">
+                  <Link
+                    href={`/movies/${movie.imdbID}`}
+                    className="flex items-center text-purple-700"
+                  >
+                    <FaInfoCircle className="mr-2" />
+                    <span>See More</span>
+                  </Link>
+                  <button
+                    onClick={() => handleBookmarkToggle(movie)}
+                    aria-label="Bookmark movie"
+                  >
+                    {bookmarks.some(
+                      (bookmark) => bookmark.movieId === movie.imdbID
+                    ) ? (
+                      <FaBookmark className="text-purple-700" />
+                    ) : (
+                      <FaRegBookmark className="text-gray-400" />
+                    )}
+                  </button>
+                </div>
+              </Card>
             ))}
           </motion.div>
         )}
@@ -168,6 +192,15 @@ const MainMoviePage = () => {
       {renderMoviesSection("thriller", thriller)}
       {renderMoviesSection("fantasy", fantasy)}
       {renderMoviesSection("animation", animation)}
+
+      {/* Alert Notification */}
+      {alertVisible && (
+        <div className="fixed top-16 right-4 z-50">
+          <Alert color={alertColor} onDismiss={() => setAlertVisible(false)}>
+            {alertMessage}
+          </Alert>
+        </div>
+      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { Card, Spinner, Pagination } from "flowbite-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { FaInfoCircle } from "react-icons/fa";
 
 // Custom hook for detecting window size
 const useWindowSize = () => {
@@ -102,45 +103,48 @@ const MainTvSeriesPage = () => {
             initial="hidden"
             animate="visible"
           >
-            {paginatedSeries.map((series, i) => (
-              <Link href={`/tv-series/${series.imdbID}`} key={series.imdbID}>
-                <motion.div variants={cardVariants}>
-                  <Card className="dark:bg-gray-800 shadow-lg">
-                    <Image
-                      className="w-full h-60 rounded-t-lg object-fill"
-                      src={
-                        series.Poster !== "N/A"
-                          ? series.Poster
-                          : "/fallback.png"
-                      }
-                      alt={`${series.Title} Poster`}
-                      width={300}
-                      height={320}
-                      priority
-                    />
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold text-purple-700">
-                        {series.Title} ({series.Year})
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <strong>Rated:</strong> {series.Rated || "N/A"}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <strong>Genre:</strong> {series.Genre || "N/A"}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <strong>Runtime:</strong> {series.Runtime || "N/A"}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <strong>Released:</strong> {series.Released || "N/A"}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-justify">
-                        <strong>Plot:</strong> {series.Plot || "N/A"}
-                      </p>
-                    </div>
-                  </Card>
-                </motion.div>
-              </Link>
+            {paginatedSeries.map((series) => (
+              <Card className="dark:bg-gray-800 shadow-lg" key={series.imdbID}>
+                <Image
+                  className="w-full h-60 rounded-t-lg object-fill"
+                  src={
+                    series.Poster !== "N/A" ? series.Poster : "/fallback.png"
+                  }
+                  alt={`${series.Title} Poster`}
+                  width={300}
+                  height={320}
+                  priority
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-purple-700">
+                    {series.Title} ({series.Year})
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <strong>Rated:</strong> {series.Rated || "N/A"}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <strong>Genre:</strong> {series.Genre || "N/A"}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <strong>Runtime:</strong> {series.Runtime || "N/A"}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <strong>Released:</strong> {series.Released || "N/A"}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-justify">
+                    <strong>Plot:</strong> {series.Plot || "N/A"}
+                  </p>
+                </div>
+                <div className="flex justify-center p-4">
+                  <Link
+                    href={`/tv-series/${series.imdbID}`}
+                    className="flex items-center text-purple-700"
+                  >
+                    <FaInfoCircle className="mr-2" />
+                    <span>See More</span>
+                  </Link>
+                </div>
+              </Card>
             ))}
           </motion.div>
         )}
