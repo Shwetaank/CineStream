@@ -1,5 +1,5 @@
 /* Add Flowbite base styles */
-@import "flowbite-react";
+@import "flowbite";
 
 /* Tailwind CSS */
 @tailwind base;
