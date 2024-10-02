@@ -18,7 +18,7 @@ const Footer = () => {
     { path: "/movies", label: "Movies" },
     { path: "/tv-series", label: "Tv Series" },
     { path: "/bookmark", label: "Bookmarks" },
-    { path: "/about", label: "About Us" },
+    { path: "/api-doc", label: "API Docs" },
   ];
 
   return (

@@ -1,4 +1,3 @@
-// Import necessary libraries
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
@@ -23,7 +22,6 @@ const isValidObjectId = (id) => {
   return /^[a-fA-F0-9]{24}$/.test(id);
 };
 
-// Get all bookmarks for the authenticated user
 export async function GET(request) {
   try {
     console.log("GET request for bookmarks received");
@@ -47,7 +45,6 @@ export async function GET(request) {
   }
 }
 
-// Create a new bookmark
 export async function POST(request) {
   try {
     console.log("POST request for bookmark creation received");
@@ -83,7 +80,6 @@ export async function POST(request) {
   }
 }
 
-// Delete a bookmark by ID
 export async function DELETE(request) {
   try {
     console.log("DELETE request for bookmark received");

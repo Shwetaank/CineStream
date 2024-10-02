@@ -60,7 +60,10 @@ export async function DELETE(request) {
     const { id } = await request.json();
 
     if (!id) {
-      return NextResponse.json({ error: "Missing testimonial ID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing testimonial ID" },
+        { status: 400 }
+      );
     }
 
     const testimonial = await prisma.testimonials.delete({
