@@ -49,9 +49,10 @@ A dynamic and responsive movie streaming platform 🎥 tailored for delivering a
 
 ## Demo 🎥
 
-Check out the demo video to see **Cinestream** in action:
 
-[Demo Video](https://example.com/demo)
+https://github.com/user-attachments/assets/08f165a6-1390-4730-afc0-970392e85d06
+
+
 
 ## Installation ⚙️
 
